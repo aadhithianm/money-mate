@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { UIProvider } from "@/providers/UIProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { AppShell } from "@/shared/layout/AppShell";
 import "./globals.css";
 
@@ -47,7 +48,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors">
         <UIProvider>
-          <AppShell>{children}</AppShell>
+          <AuthProvider>
+            <AppShell>{children}</AppShell>
+          </AuthProvider>
         </UIProvider>
       </body>
     </html>

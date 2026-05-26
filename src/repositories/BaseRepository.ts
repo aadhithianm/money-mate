@@ -4,7 +4,7 @@ import { DatabaseError, toAppError } from "@/types/errors";
 
 // ─── Abstract Base Repository ────────────────────────────────────────────────
 
-export abstract class BaseRepository<T extends { id: string; workspace_id: string }> {
+export abstract class BaseRepository<T extends { id: string; workspace_id?: string }> {
   protected abstract readonly tableName: string;
 
   protected get table() {

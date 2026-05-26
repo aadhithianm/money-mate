@@ -8,3 +8,5 @@ export * from "./entities";
 export * from "./sync";
 export * from "./errors";
 export * from "./schemas";
+export * from "./auth";
+

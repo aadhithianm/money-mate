@@ -116,7 +116,7 @@ export const transactionTypeSchema = z.enum([
   "transfer",
 ] satisfies [TransactionType, ...TransactionType[]]);
 
-export const transactionSchema = z.object({
+export const transactionBaseSchema = z.object({
   id: uuidSchema,
   workspace_id: uuidSchema,
   account_id: uuidSchema,
@@ -131,7 +131,9 @@ export const transactionSchema = z.object({
   created_at: isoDateSchema,
   updated_at: isoDateSchema,
   deleted_at: isoDateSchema.optional(),
-}).refine(
+});
+
+export const transactionSchema = transactionBaseSchema.refine(
   (data) => {
     // Transfer transactions must specify the destination account
     if (data.type === "transfer") {
@@ -145,16 +147,42 @@ export const transactionSchema = z.object({
   }
 );
 
-export const createTransactionSchema = transactionSchema.omit({
+export const createTransactionSchema = transactionBaseSchema.omit({
   id: true,
   created_at: true,
   updated_at: true,
   deleted_at: true,
-});
+}).refine(
+  (data) => {
+    if (data.type === "transfer") {
+      return !!data.transfer_account_id;
+    }
+    return true;
+  },
+  {
+    message: "Transfer transactions require a transfer_account_id",
+    path: ["transfer_account_id"],
+  }
+);
 
-export const updateTransactionSchema = createTransactionSchema.partial().extend({
+export const updateTransactionSchema = transactionBaseSchema.omit({
+  created_at: true,
+  updated_at: true,
+  deleted_at: true,
+}).partial().extend({
   id: uuidSchema,
-});
+}).refine(
+  (data) => {
+    if (data.type === "transfer") {
+      return !!data.transfer_account_id;
+    }
+    return true;
+  },
+  {
+    message: "Transfer transactions require a transfer_account_id",
+    path: ["transfer_account_id"],
+  }
+);
 
 // ─── Inferred Types from Zod ──────────────────────────────────────────────────
 

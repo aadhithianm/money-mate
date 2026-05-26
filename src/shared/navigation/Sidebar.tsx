@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore } from "@/stores/uiStore";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { ChevronLeft, ChevronRight, LogOut, User as UserIcon } from "lucide-react";
 import { cn } from "@/utils/styles";
 import { navigationConfig } from "./config";
+import { Avatar } from "@/shared/ui/Avatar";
 
 export const Sidebar: React.FC = () => {
-  const { sidebarOpen, toggleSidebar } = useUIStore();
+  const { sidebarOpen, toggleSidebar, addToast } = useUIStore();
+  const { user, logout } = useAuthStore();
   const [isHovered, setIsHovered] = useState(false);
   const [activeTab, setActiveTab] = useState("transactions");
 
@@ -16,6 +19,21 @@ export const Sidebar: React.FC = () => {
   const navigationItems = navigationConfig.filter((item) => !item.isPlaceholder);
 
   const isOpen = sidebarOpen || isHovered;
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      addToast("Successfully logged out", "info");
+    } catch {
+      addToast("Failed to log out", "error");
+    }
+  };
+
+  const getInitials = () => {
+    if (!user) return "MM";
+    const name = user.user_metadata?.full_name || user.email || "MM";
+    return name.substring(0, 2).toUpperCase();
+  };
 
   return (
     <motion.aside
@@ -28,7 +46,7 @@ export const Sidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Sidebar Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-border/40">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-border/40 flex-shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center flex-shrink-0">
             <span className="text-primary-foreground font-bold text-sm">M</span>
@@ -88,6 +106,50 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
+      {/* Profile & Logout Section at bottom */}
+      <div className="p-3 border-t border-border/40 mt-auto flex-shrink-0 space-y-2">
+        <div className="flex items-center space-x-3 px-1">
+          <Avatar
+            size="sm"
+            fallback={getInitials()}
+            src={user?.user_metadata?.avatar_url}
+          />
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 min-w-0"
+            >
+              <p className="text-xs font-bold text-foreground truncate">
+                {user?.user_metadata?.full_name || user?.email?.split("@")[0]}
+              </p>
+              <p className="text-[9px] font-medium text-muted-foreground truncate">
+                {user?.email}
+              </p>
+            </motion.div>
+          )}
+        </div>
+
+        {isOpen ? (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-3 py-2 rounded-md hover:bg-secondary/60 text-xs font-semibold text-destructive/80 hover:text-destructive cursor-pointer transition-all"
+          >
+            <LogOut className="h-4 w-4 mr-3 flex-shrink-0" />
+            <span>Logout</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="w-full flex justify-center p-2 rounded-md hover:bg-secondary/60 text-destructive/80 hover:text-destructive cursor-pointer transition-all"
+            aria-label="Logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
       {/* Collapsed Toggle Button */}
       {!sidebarOpen && !isHovered && (
         <div className="p-3 flex justify-center border-t border-border/40">
@@ -102,3 +164,4 @@ export const Sidebar: React.FC = () => {
     </motion.aside>
   );
 };
+export default Sidebar;
