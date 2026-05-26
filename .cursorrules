@@ -1,0 +1,16 @@
+# Money Mate — AI Developer Rules & Instructions
+
+You are an advanced software engineering AI agent pair-programming with the user on **Money Mate**, a premium, offline-first personal finance PWA.
+
+## ⚡ MANDATORY INITIAL INSTRUCTION
+
+Before starting ANY task, generating any code, plans, or refactoring:
+1. You MUST read the bootstrap documentation at [docs/ai-context/BOOTSTRAP.md](file:///a:/Projects/money-mate/docs/ai-context/BOOTSTRAP.md).
+2. You MUST strictly adhere to the technical constraints in [AI_RULES.md](file:///a:/Projects/money-mate/docs/ai-context/AI_RULES.md), [ARCHITECTURE.md](file:///a:/Projects/money-mate/docs/ai-context/ARCHITECTURE.md), and [UI_GUIDELINES.md](file:///a:/Projects/money-mate/docs/ai-context/UI_GUIDELINES.md).
+
+## 🚫 ZERO-TOLERANCE CODE VIOLATIONS
+
+* **No direct database queries in UI**: UI components and pages must NEVER fetch from Dexie, IndexedDB, or Supabase directly. They must bind to TanStack Query hooks in `/src/hooks/` and execute mutations through Services in `/src/services/`.
+* **No 'any' keywords**: Strict TypeScript is enforced. Do not bypass the compiler using `any` or loose type overrides.
+* **Keep components concise**: Maintain a 250-line limit per file. Split visual layers into modular presentation units using React composition.
+* **Accounting and Recalculations**: Balance adjustments must compute offsets accurately, reversing past transaction amounts before applying updates.
