@@ -24,7 +24,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
-  const [windowHeight, setWindowHeight] = useState(0);
+  const [windowHeight, setWindowHeight] = useState(() => 
+    typeof window !== "undefined" ? window.innerHeight : 800
+  );
   const [activeSnapIndex, setActiveSnapIndex] = useState(defaultSnapIndex);
 
   // Focus trap ref
@@ -128,9 +130,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           {/* Sliding Bottom Drawer */}
           <motion.div
             ref={containerRef}
-            initial={{ y: "100%" }}
+            initial={{ y: windowHeight }}
             animate={controls}
-            exit={{ y: "100%" }}
+            exit={{ y: windowHeight }}
             transition={{ type: "spring", stiffness: 350, damping: 32 }}
             drag="y"
             dragConstraints={{ top: actualSnapOffsets[snapPoints.length - 1], bottom: windowHeight }}

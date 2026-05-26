@@ -6,6 +6,7 @@ import type {
   Category,
   Transaction,
   SyncQueueItem,
+  FinancialEventRecord,
 } from "@/types/entities";
 
 // ─── Database Table Row Types ────────────────────────────────────────────────
@@ -18,6 +19,7 @@ type AccountTable = Account;
 type CategoryTable = Category;
 type TransactionTable = Transaction;
 type SyncQueueTable = SyncQueueItem;
+type FinancialEventTable = FinancialEventRecord;
 
 // ─── Dexie Database Class ─────────────────────────────────────────────────────
 
@@ -29,6 +31,7 @@ export class MoneyMateDB extends Dexie {
   categories!: EntityTable<CategoryTable, "id">;
   transactions!: EntityTable<TransactionTable, "id">;
   sync_queue!: EntityTable<SyncQueueTable, "id">;
+  financial_events!: EntityTable<FinancialEventTable, "id">;
 
   constructor() {
     super("money-mate");
@@ -108,6 +111,18 @@ export class MoneyMateDB extends Dexie {
         "retry_count",
         "created_at",
         "[status+created_at]", // Compound: ordered queue processing
+      ].join(", "),
+    });
+
+    this.version(2).stores({
+      financial_events: [
+        "id",
+        "workspace_id",
+        "type",
+        "account_id",
+        "created_at",
+        "[workspace_id+type]",
+        "[workspace_id+account_id]",
       ].join(", "),
     });
 

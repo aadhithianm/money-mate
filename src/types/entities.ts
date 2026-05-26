@@ -139,3 +139,27 @@ export interface SerializedAppError {
   details?: unknown;
   timestamp: ISODateString;
 }
+
+// ─── Financial Event Store (Immutable Event Sourcing) ─────────────────────────
+
+export type FinancialEventCategory =
+  | "expense"
+  | "income"
+  | "transfer"
+  | "settlement"
+  | "refund"
+  | "recurring";
+
+export interface FinancialEventRecord {
+  id: UUID;
+  workspace_id: UUID;
+  account_id: UUID;
+  type: FinancialEventCategory;
+  amount: number; // Stored in cents (integer)
+  currency: string;
+  description: string;
+  reference_id: UUID; // Links to the transaction UUID or other triggers
+  created_at: ISODateString;
+  metadata?: Record<string, unknown>;
+}
+
